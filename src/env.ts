@@ -1,4 +1,4 @@
-import { envsafe, str, bool } from "envsafe";
+import { envsafe, str, bool, num } from "envsafe";
 
 export const env = envsafe({
   CONVEX_SELF_HOSTED_ADMIN_KEY: str(),
@@ -46,5 +46,15 @@ export const env = envsafe({
   SUPPORT_OBJECT_LOCK: bool({
     desc: 'Enables support for buckets with object lock by providing an MD5 hash with the backup file',
     default: false
+  }),
+  MAX_BACKUP_COUNT: num({
+    desc: 'Maximum number of backups to keep. Older backups will be deleted. Leave unset to disable count-based cleanup.',
+    default: undefined,
+    allowEmpty: true
+  }),
+  MAX_BACKUP_AGE_DAYS: num({
+    desc: 'Maximum age of backups in days. Backups older than this will be deleted. Leave unset to disable age-based cleanup.',
+    default: undefined,
+    allowEmpty: true
   }),
 })

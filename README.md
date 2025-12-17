@@ -36,3 +36,50 @@ backups are importable to cloud or any selfhosted instance via `npx convex impor
 - `SINGLE_SHOT_MODE` - Run a single backup on start and exit when completed. Useful with the platform's native CRON schedular.
 
 - `SUPPORT_OBJECT_LOCK` - Enables support for buckets with object lock by providing an MD5 hash with the backup file.
+
+- `MAX_BACKUP_COUNT` - Maximum number of backups to keep. Older backups will be automatically deleted after each backup. Leave unset to disable count-based cleanup.
+
+- `MAX_BACKUP_AGE_DAYS` - Maximum age of backups in days. Backups older than this will be automatically deleted after each backup. Leave unset to disable age-based cleanup.
+
+## Backup Retention & Cleanup
+
+The backup script supports automatic cleanup of old backups based on retention policies. Cleanup runs automatically after each successful backup.
+
+### Retention Policies
+
+You can configure two types of retention policies (both optional and can be used together):
+
+1. **Count-based retention** (`MAX_BACKUP_COUNT`): Keep only the N most recent backups
+2. **Age-based retention** (`MAX_BACKUP_AGE_DAYS`): Delete backups older than N days
+
+If both policies are configured, a backup will be deleted if it meets **either** condition (exceeds max count OR exceeds max age).
+
+### Examples
+
+**Keep last 30 backups:**
+```bash
+MAX_BACKUP_COUNT=30
+```
+
+**Delete backups older than 90 days:**
+```bash
+MAX_BACKUP_AGE_DAYS=90
+```
+
+**Combined policy (keep last 30 backups AND delete anything older than 90 days):**
+```bash
+MAX_BACKUP_COUNT=30
+MAX_BACKUP_AGE_DAYS=90
+```
+
+**No automatic cleanup (default):**
+```bash
+# Leave both variables unset
+```
+
+### Notes
+
+- Cleanup is **disabled by default** - you must explicitly set at least one retention policy to enable it
+- Cleanup is **subfolder-aware** - it only affects backups in the same `BUCKET_SUBFOLDER` with matching `BACKUP_FILE_PREFIX`
+- Cleanup runs **after each successful backup** to ensure storage limits are maintained
+- Failed cleanups are logged but do not stop the backup process

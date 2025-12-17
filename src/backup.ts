@@ -8,6 +8,7 @@ import os from "os";
 
 import { env } from "./env.js";
 import { createMD5 } from "./util.js";
+import { cleanupOldBackups } from "./cleanup.js";
 
 const uploadToS3 = async ({ name, path }: { name: string, path: string }) => {
   console.log("Uploading backup to S3...");
@@ -104,4 +105,7 @@ export const backup = async () => {
   await deleteFile(filepath);
 
   console.log("DB backup complete...");
+
+  // Clean up old backups if retention policies are configured
+  await cleanupOldBackups();
 }
